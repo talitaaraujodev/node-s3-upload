@@ -3,16 +3,17 @@ import path from "path";
 import crypto from "crypto";
 import moment from "moment";
 
-const tmpFolder = path.resolve(__dirname, "..", "uploads");
 
 export default {
-  directory: tmpFolder,
+  directory: path.resolve(__dirname, "..", "uploads"),
   storage: multer.diskStorage({
-    destination: tmpFolder,
+    destination: (req, file, cb) => {
+      cb(null, path.resolve(__dirname, "..", "uploads"));
+    },
     filename: (req, file, callback) => {
-      crypto.randomBytes(16, (err: any, hash) => {
+      crypto.randomBytes(12, (err: any, hash) => {
         if (err) callback(null, err);
-        const filename = `${moment().format("YYYY-MM-DD-HH:mm:ss")}-${
+        const filename = `${hash.toString('hex')}-${moment().format("YYYY-MM-DD-HH:mm:ss")}-${
           file.originalname
         }`;
         callback(null, filename);

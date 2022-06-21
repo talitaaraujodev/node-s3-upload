@@ -3,15 +3,14 @@ import multer from "multer";
 import uploadConfig from "./config/upload";
 import ImageService from "./services/ImageService";
 const routes = Router();
-const upload = multer(uploadConfig);
+const upload = multer(uploadConfig,);
 
 routes.post(
   "/upload",
-  upload.single("file"),
+  upload.array("files", 3),
   async (request: Request, response: Response) => {
-    const { file } = request;
-    console.log("routesss", file);
-    await ImageService.save(file);
+    const files : any = request.files;
+    await ImageService.save(files);
 
     return response.json({ success: true });
   }

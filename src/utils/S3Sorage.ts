@@ -19,30 +19,23 @@ class S3Storage {
     });
   }
 
-  async saveFile(file: string): Promise<void> {
-    console.log(file);
-    const originalPath = path.resolve(uploadConfig.directory, file);
-    console.log(originalPath);
-    const ContentType = mime.getType(originalPath);
-   
-    if (!ContentType) {
-      throw new Error("File not found");
-    }
+  async saveFile(files: string[]): Promise<any> {
+    const params = files.map((file: string) => {
+      return {
+        Bucket: process.env.AWS_BUCKET,
+        Key: file,
+      };
+    });
+ 
 
-    const fileContent = fs.readFileSync(originalPath);
-
-    const params = {
-      Bucket: "teste-system-ged",
-      Key: file,
-      Body: fileContent
-    };
-    console.log(params);
-    await this.client.send(new PutObjectCommand(params));
+  return await Promise.all(
+      params.map((param: any) => this.client.send(new PutObjectCommand(param)))
+    );
   }
 
   async deleteFile(file: string): Promise<void> {
     const params = {
-      Bucket: "teste-system-ged",
+      Bucket: process.env.AWS_BUCKET,
       Key: file
     };
     await this.client.send(new DeleteObjectCommand(params));
