@@ -2,13 +2,11 @@ import S3Sorage from "../utils/S3Sorage";
 
 class ImageService {
   constructor() {}
-  async save(file: Express.Multer.File): Promise<void> {
-
+  async save(file: any): Promise<void> {
+    console.log(file);
     await S3Sorage.saveFile(file.filename);
   }
   async delete(file: string): Promise<void> {
-
-
     await S3Sorage.deleteFile(file);
   }
 }

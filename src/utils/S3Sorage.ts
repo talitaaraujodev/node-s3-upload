@@ -1,50 +1,51 @@
 import path from "path";
 import fs from "fs";
 import mime from "mime";
-import aws, { S3 } from "aws-sdk";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand
+} from "@aws-sdk/client-s3";
 import uploadConfig from "../config/upload";
-
+import { fromIni } from "@aws-sdk/credential-provider-ini";
 
 class S3Storage {
-  private client: S3;
+  private client: S3Client;
 
   constructor() {
-    this.client = new aws.S3({
-      region: "us-east-1"
+    this.client = new S3Client({
+      region: "us-east-1",
+      credentials: fromIni({ profile: "default" })
     });
   }
 
   async saveFile(file: string): Promise<void> {
+    console.log(file);
     const originalPath = path.resolve(uploadConfig.directory, file);
-
+    console.log(originalPath);
     const ContentType = mime.getType(originalPath);
-
+   
     if (!ContentType) {
       throw new Error("File not found");
     }
 
-    const fileContent = await fs.promises.readFile(originalPath);
+    const fileContent = fs.readFileSync(originalPath);
 
-    this.client
-      .putObject({
-        Bucket: "teste-system-ged",
-        Key: file,
-        ACL: "public-read",
-        Body: fileContent,
-        ContentType
-      })
-      .promise();
-
-    await fs.promises.unlink(originalPath);
+    const params = {
+      Bucket: "teste-system-ged",
+      Key: file,
+      Body: fileContent
+    };
+    console.log(params);
+    await this.client.send(new PutObjectCommand(params));
   }
 
   async deleteFile(file: string): Promise<void> {
-    await this.client
-      .deleteObject({
-        Bucket: "aula-youtube",
-        Key: file
-      })
-      .promise();
+    const params = {
+      Bucket: "teste-system-ged",
+      Key: file
+    };
+    await this.client.send(new DeleteObjectCommand(params));
   }
 }
 
