@@ -1,13 +1,11 @@
-import path from "path";
 import fs from "fs";
-import mime from "mime";
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand
 } from "@aws-sdk/client-s3";
-import uploadConfig from "../config/upload";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
+import mime from "mime";
 
 class S3Storage {
   private client: S3Client;
@@ -19,18 +17,20 @@ class S3Storage {
     });
   }
 
-  async saveFile(files: string[]): Promise<any> {
-    const params = files.map((file: string) => {
-      return {
-        Bucket: process.env.AWS_BUCKET,
-        Key: file,
-      };
-    });
- 
+  async saveFile(file: any): Promise<any> {
+    console.log(file);
+    // ler o arquivo
+    const fileContent = fs.readFileSync(file.path, { encoding: "utf8" });
 
-  return await Promise.all(
-      params.map((param: any) => this.client.send(new PutObjectCommand(param)))
-    );
+    if (!fileContent) {
+      throw new Error("File not found");
+    }
+    const params = {
+      Bucket: process.env.AWS_BUCKET,
+      Key: file.filename,
+      Body: fileContent
+    };
+    return this.client.send(new PutObjectCommand(params));
   }
 
   async deleteFile(file: string): Promise<void> {
