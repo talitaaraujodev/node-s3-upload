@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, request } from "express";
 import multer from "multer";
 import uploadConfig from "./config/upload";
 import ImageService from "./services/ImageService";
@@ -14,7 +14,9 @@ routes.post(
       await ImageService.save(file);
     }
 
-    return response.json({ success: true });
+    return response.json({
+      message: "Upload de arquivo realizado com sucesso "
+    });
   }
 );
 
@@ -23,7 +25,17 @@ routes.delete("/upload/:file", async (request: Request, response: Response) => {
 
   await ImageService.delete(file);
 
-  return response.send();
+  return response.send({ message: "Deletado com sucesso" });
+});
+
+routes.get("/upload", async (request: Request, response: Response) => {
+  const files = await ImageService.listing();
+  return response.json({ files });
+});
+routes.get("/upload/:file", async (request: Request, response: Response) => {
+  const { file } = request.params;
+  const getFile = await ImageService.findOne(file);
+  return response.json({ getFile });
 });
 
 export { routes };
