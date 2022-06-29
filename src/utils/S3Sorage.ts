@@ -18,16 +18,16 @@ class S3Storage {
     });
   }
 
-  async saveFile(file: any): Promise<any> {
+  async saveFile(files: any): Promise<any> {
     // ler o arquivo
-    const fileContent = fs.readFileSync(file.path, { encoding: "utf8" });
+    const fileContent = fs.readFileSync(files.path, { encoding: "utf8" });
 
     if (!fileContent) {
       throw new Error("File not found");
     }
     const params = {
       Bucket: process.env.AWS_BUCKET,
-      Key: file.filename,
+      Key: files.filename,
       Body: fileContent
     };
     return await this.client.send(new PutObjectCommand(params));

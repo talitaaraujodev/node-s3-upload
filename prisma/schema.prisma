@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+// key -> nome do arquivo criptografado
+// name -> original name
+// url -> url que o arquivo está contido 
+model Arquivos {
+  id              Int               @id @default(autoincrement())
+  name            String
+  key             String
+  size            Int
+  url             String
+  descricao       String
+  validade        DateTime
+  createdAt       DateTime          @default(now())
+
+  @@map("arquivos")
+}
