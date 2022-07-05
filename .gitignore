@@ -3,3 +3,4 @@ dist
 .env
 dist
 vscode
+/tmp/uploads

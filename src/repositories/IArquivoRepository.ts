@@ -1,10 +1,10 @@
-import { Arquivo } from './../entities/Arquivo';
-
+import { Arquivo } from "./../entities/Arquivo";
 
 interface IArquivoRepository {
-  create: (arquivoCreateDTO: Arquivo) => Promise<any>;
+  create: (arquivo: Arquivo[]) => Promise<any>;
   findAll: () => Promise<any>;
-  finOne: (id: number) => Promise<any>;
-  delete: (id: number) => Promise<any>;
+  findOne: (id: number) => Promise<any>;
+  findName: (name: string) => Promise<any>;
+  delete: (name: string) => Promise<any>;
 }
 export { IArquivoRepository };

@@ -9,9 +9,16 @@ routes.post(
   "/upload",
   upload.array("files"),
   async (request: Request, response: Response) => {
-    const files: any = request;
-    for (let file of files) {
-      await ArquivoService.save(file);
+    const files: any = request.files;
+    const data = JSON.parse(request.body.data);
+    const arquivos = data.map((item: any, index: any) => {
+      return [{
+        data: item,
+        file: files[index]
+      }];
+    });
+    for (let data of arquivos) {
+      await ArquivoService.save(data);
     }
     return response.json({
       message: "Upload de arquivo realizado com sucesso "

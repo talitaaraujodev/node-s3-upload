@@ -1,12 +1,12 @@
-import fs from "fs";
 import {
-  S3Client,
-  PutObjectCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
   ListObjectsCommand,
-  GetObjectCommand
+  PutObjectCommand,
+  S3Client
 } from "@aws-sdk/client-s3";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
+import fs from "fs";
 
 class S3Storage {
   private client: S3Client;
@@ -20,17 +20,19 @@ class S3Storage {
 
   async saveFile(files: any): Promise<any> {
     // ler o arquivo
-    const fileContent = fs.readFileSync(files.path, { encoding: "utf8" });
+    for (let file of files) {
+      const fileContent = fs.readFileSync(file.path, { encoding: "utf8" });
 
-    if (!fileContent) {
-      throw new Error("File not found");
+      if (!fileContent) {
+        throw new Error("File not found");
+      }
+      const params = {
+        Bucket: process.env.AWS_BUCKET,
+        Key: file.filename,
+        Body: fileContent
+      };
+      return await this.client.send(new PutObjectCommand(params));
     }
-    const params = {
-      Bucket: process.env.AWS_BUCKET,
-      Key: files.filename,
-      Body: fileContent
-    };
-    return await this.client.send(new PutObjectCommand(params));
   }
 
   async deleteFile(file: string): Promise<any> {
@@ -44,6 +46,7 @@ class S3Storage {
     const files = await this.client.send(
       new ListObjectsCommand({ Bucket: process.env.AWS_BUCKET })
     );
+    console.log(files);
     return files.Contents?.map((item: any) => {
       return {
         name: item.Key
