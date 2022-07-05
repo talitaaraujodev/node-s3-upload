@@ -53,6 +53,14 @@ class S3Storage {
       };
     });
   }
+  async downloadFile(file: string): Promise<any> {
+    const params: any = {
+      Bucket: process.env.AWS_BUCKET || "",
+      Key: file
+      // ContentType: "application/octet-stream"
+    };
+    return await this.client.send(new GetObjectCommand(params));
+  }
   async findOneFile(file: string): Promise<any> {
     const params = {
       Bucket: process.env.AWS_BUCKET,

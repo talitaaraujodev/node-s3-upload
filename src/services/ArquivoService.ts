@@ -1,16 +1,7 @@
 import ArquivoPrismaRepository from "../repositories/ArquivoPrismaRepository";
 import { IArquivoRepository } from "../repositories/IArquivoRepository";
 import S3Sorage from "../utils/S3Sorage";
-// interface ArquivoDto {
-//   files: {
-//     originalname: string;
-//     filename: string;
-//     size: number;
-//     path?: string;
-//   };
-//   descricao?: string;
-//   validade?: Date;
-// }
+
 class ArquivoService {
   constructor(private readonly arquivoRepository: IArquivoRepository) {}
   async save(data: any): Promise<any> {
@@ -32,8 +23,8 @@ class ArquivoService {
         path: item.file.path
       };
     });
-
     const saveArquivoS3 = await S3Sorage.saveFile(files);
+    console.log(saveArquivoS3);
     if (saveArquivoS3) {
       await this.arquivoRepository.create(arquivo);
     }
@@ -53,6 +44,9 @@ class ArquivoService {
   }
   async findOne(file: string): Promise<any> {
     return await S3Sorage.findOneFile(file);
+  }
+  async downloadFile(file: string): Promise<any> {
+    return await S3Sorage.downloadFile(file);
   }
 }
 

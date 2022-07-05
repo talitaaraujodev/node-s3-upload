@@ -12,10 +12,12 @@ routes.post(
     const files: any = request.files;
     const data = JSON.parse(request.body.data);
     const arquivos = data.map((item: any, index: any) => {
-      return [{
-        data: item,
-        file: files[index]
-      }];
+      return [
+        {
+          data: item,
+          file: files[index]
+        }
+      ];
     });
     for (let data of arquivos) {
       await ArquivoService.save(data);
@@ -37,6 +39,11 @@ routes.delete("/upload/:file", async (request: Request, response: Response) => {
 routes.get("/upload", async (request: Request, response: Response) => {
   const files = await ArquivoService.listing();
   return response.json({ files });
+});
+routes.get("/download/:file", async (request: Request, response: Response) => {
+  const file: any = request.params.file;
+  await ArquivoService.downloadFile(file);
+  return response.end();
 });
 routes.get("/upload/:file", async (request: Request, response: Response) => {
   const { file } = request.params;
