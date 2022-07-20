@@ -17,7 +17,6 @@ model Arquivos {
   size      Int
   url       String
   descricao String
-  validade  DateTime
   createdAt DateTime @default(now())
 
   @@map("arquivos")

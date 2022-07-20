@@ -5,6 +5,5 @@ export interface Arquivo {
   size: number;
   url: string;
   descricao: string;
-  validade: Date;
   createdAt?: Date;
 }

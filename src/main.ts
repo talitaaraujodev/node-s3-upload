@@ -1,13 +1,15 @@
-import 'dotenv/config';
-
-import express from 'express';
-
-import {routes} from './routes';
-
+import "dotenv/config";
+import express from "express";
+import "express-async-errors";
+import { errorMiddleware } from "./middlewares/Error";
+import { routes } from "./routes";
 const app = express();
+const port = process.env.PORT || 8000;
 
+app.use(express.json());
 app.use(routes);
+app.use(errorMiddleware);
 
-app.listen(9000, () => {
-  console.log('Server is running on PORT 9000');
+app.listen(port, () => {
+  console.log(`Server is running on PORT ${port}`);
 });

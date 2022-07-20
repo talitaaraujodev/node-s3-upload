@@ -13,9 +13,19 @@ class ArquivoPrismaRepository implements IArquivoRepository {
   async findOne(id: number): Promise<any> {
     return await prisma.arquivos.findUnique({ where: { id } });
   }
-  async findName(name: string): Promise<any> {
+  async findByName(name: string): Promise<any> {
     return await prisma.arquivos.findUnique({ where: { name } });
   }
+  async findByNames(names: any): Promise<any> {
+    for (const name of names) {
+      return await prisma.arquivos.findUnique({
+        where: {
+          name,
+        },
+      });
+    }
+  }
+
   async delete(name: string): Promise<any> {
     return await prisma.arquivos.delete({ where: { name } });
   }

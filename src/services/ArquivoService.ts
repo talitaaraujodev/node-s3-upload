@@ -1,17 +1,20 @@
 import ArquivoPrismaRepository from "../repositories/ArquivoPrismaRepository";
 import { IArquivoRepository } from "../repositories/IArquivoRepository";
-import S3Sorage from "../utils/S3Sorage";
-
+import S3Sorage from "../utils/S3Storage";
+import { ResponseError } from "./../helpers/ResponseError";
 class ArquivoService {
   constructor(private readonly arquivoRepository: IArquivoRepository) {}
   async save(data: any): Promise<any> {
+    const names = data.map((item: any) => {
+      return item.file.originalname;
+    });
+    const arquivosExist = await this.arquivoRepository.findByNames(names);
     const arquivo = data.map((item: any) => {
       return {
         name: item.file.originalname,
         key: item.file.filename,
         size: item.file.size,
         url: "",
-        validade: new Date(),
         descricao: item.data.descricao
       };
     });
@@ -23,27 +26,33 @@ class ArquivoService {
         path: item.file.path
       };
     });
-    const saveArquivoS3 = await S3Sorage.saveFile(files);
-    console.log(saveArquivoS3);
-    if (saveArquivoS3) {
-      await this.arquivoRepository.create(arquivo);
+
+    console.log(arquivosExist);
+    if (arquivosExist) {
+      throw new ResponseError("Arquivo já existe", 400);
     }
+
+    await this.arquivoRepository.create(arquivo);
+    await S3Sorage.saveFile(files);
   }
   async delete(file: string): Promise<any> {
     const name = file;
-    const deleteFileS3 = await S3Sorage.deleteFile(file);
-    const fileExist = await this.arquivoRepository.findName(name);
-    if (deleteFileS3) {
-      if (fileExist) {
-        await this.arquivoRepository.delete(name);
-      }
+    const arquivoExist = await this.arquivoRepository.findByName(name);
+
+    if (arquivoExist) {
+      await S3Sorage.deleteFile(file);
+      await this.arquivoRepository.delete(name);
     }
   }
+
   async listing(): Promise<any> {
-    return await S3Sorage.findAllFiles();
+    return await this.arquivoRepository.findAll();
   }
   async findOne(file: string): Promise<any> {
-    return await S3Sorage.findOneFile(file);
+    const arquivoExist = await this.arquivoRepository.findByName(file);
+    if (arquivoExist) {
+      await this.arquivoRepository.findByName(file);
+    }
   }
   async downloadFile(file: string): Promise<any> {
     return await S3Sorage.downloadFile(file);
