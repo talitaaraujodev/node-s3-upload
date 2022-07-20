@@ -20,8 +20,8 @@ class ArquivoPrismaRepository implements IArquivoRepository {
     for (const name of names) {
       return await prisma.arquivos.findUnique({
         where: {
-          name,
-        },
+          name
+        }
       });
     }
   }

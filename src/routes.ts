@@ -13,6 +13,6 @@ routes.post(
 routes.delete("/arquivos/:file", ArquivoController.delete);
 routes.get("/arquivos", ArquivoController.findAll);
 routes.get("/arquivos/download/:file", ArquivoController.download);
-routes.get("/arquivos/:file", ArquivoController.findOne);
+routes.get("/arquivos/:id", ArquivoController.findOne);
 
 export { routes };

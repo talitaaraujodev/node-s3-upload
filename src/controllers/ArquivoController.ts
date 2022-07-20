@@ -21,13 +21,13 @@ class ArquivoController {
     });
   }
   async findAll(request: Request, response: Response): Promise<Response> {
-    const files = await ArquivoService.listing();
-    return response.status(200).json({ files });
+    const arquivos = await ArquivoService.listing();
+    return response.status(200).json({ arquivos });
   }
   async findOne(request: Request, response: Response): Promise<Response> {
-    const { file } = request.params;
-    const getFile = await ArquivoService.findOne(file);
-    return response.status(200).json({ getFile });
+    const id: any = parseInt(request.params.id);
+    const arquivo = await ArquivoService.findOne(id);
+    return response.status(200).json({ arquivo });
   }
   async download(request: Request, response: Response): Promise<any> {
     const file: any = request.params.file;
@@ -35,7 +35,7 @@ class ArquivoController {
     return response.end();
   }
   async delete(request: Request, response: Response): Promise<Response> {
-    const { file } = request.params;
+    const file: any = request.params.file;
     await ArquivoService.delete(file);
     return response.status(200).json({ message: "Deletado com sucesso" });
   }

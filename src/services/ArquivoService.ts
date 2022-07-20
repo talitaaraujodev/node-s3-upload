@@ -1,7 +1,7 @@
 import ArquivoPrismaRepository from "../repositories/ArquivoPrismaRepository";
 import { IArquivoRepository } from "../repositories/IArquivoRepository";
 import S3Sorage from "../utils/S3Storage";
-import { ResponseError } from "./../helpers/ResponseError";
+import { BadRequestError } from "./../helpers/ResponseError";
 class ArquivoService {
   constructor(private readonly arquivoRepository: IArquivoRepository) {}
   async save(data: any): Promise<any> {
@@ -26,10 +26,8 @@ class ArquivoService {
         path: item.file.path
       };
     });
-
-    console.log(arquivosExist);
     if (arquivosExist) {
-      throw new ResponseError("Arquivo já existe", 400);
+      throw new BadRequestError("Arquivo já existe");
     }
 
     await this.arquivoRepository.create(arquivo);
@@ -48,10 +46,12 @@ class ArquivoService {
   async listing(): Promise<any> {
     return await this.arquivoRepository.findAll();
   }
-  async findOne(file: string): Promise<any> {
-    const arquivoExist = await this.arquivoRepository.findByName(file);
-    if (arquivoExist) {
-      await this.arquivoRepository.findByName(file);
+  async findOne(id: number): Promise<any> {
+    const arquivo = await this.arquivoRepository.findOne(id);
+    if (!arquivo) {
+      throw new BadRequestError("Arquivo não existe");
+    } else {
+      return arquivo;
     }
   }
   async downloadFile(file: string): Promise<any> {
